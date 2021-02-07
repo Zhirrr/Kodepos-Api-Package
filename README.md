@@ -4,9 +4,9 @@ Npm Package for Scrape KBBI
 ## How To Use
 
 ```
-const Zahir = require('kbbi-api-zhirrr');
+const KBBI = require('kbbi-api-zhirrr');
 
-Zahir.KBBI("pohon").then(res => console.log(res))
+KBBI("pohon").then(res => console.log(res))
 
 ```
 

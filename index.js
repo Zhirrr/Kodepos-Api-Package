@@ -4,40 +4,49 @@
  */
 
 
+const request = require('request');
 const cheerio = require('cheerio')
-const axios = require('axios')
 
-const Gempa = () => new Promise((resolve, reject) => {
-  axios.get('https://www.bmkg.go.id/gempabumi/gempabumi-dirasakan.bmkg').then((response) => {
-  const $ = cheerio.load(response.data)
+const Kodepos = (keywords) => {
+    return new Promise(async (resolve, reject) => {
+        let postalcode = 'https://carikodepos.com/';
+        let url = postalcode+'?s='+keywords;
 
-  const urlElems = $('table.table-hover.table-striped')
+        await request.get({
+            headers: {
+                'Accept': 'application/json, text/javascript, */*;',
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4209.3 Mobile Safari/537.36',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Origin': postalcode,
+                'Referer': postalcode
+            },
+            url: url,
+        }, function(error, response, body) {
+            if (error) return reject(error);
 
-  for (let i = 0; i < urlElems.length; i++) {
-    const urlSpan = $(urlElems[i]).find('tbody')[0]
+            let $ = cheerio.load(body);
+            var search = $('tr');
 
-    if (urlSpan) {
-      const urlData = $(urlSpan).find('tr')[0]
-      var Kapan = $(urlData).find('td')[1]
-      var Letak = $(urlData).find('td')[2]
-      var Magnitudo = $(urlData).find('td')[3]
-      var Kedalaman = $(urlData).find('td')[4]
-      var Wilayah = $(urlData).find('td')[5]
-      var lintang = $(Letak).text().split(' ')[0]
-      var bujur = $(Letak).text().split(' ')[2]
-      var hasil = {
-        Waktu: $(Kapan).text(),
-        Lintang: lintang,
-        Bujur: bujur,
-        Magnitudo: $(Magnitudo).text(),
-        Kedalaman: $(Kedalaman).text().replace(/\t/g, '').replace(/I/g, ''),
-        Wilayah: $(Wilayah).text().replace(/\t/g, '').replace(/I/g, '').replace('-','').replace(/\r/g, '').split('\n')[0],
-		Map: ''
-      }
-      resolve(hasil);
-    }
-  }
-  }).catch(err => reject(err))
-})
+            if (!search.length) return reject('No result could be found');
 
-module.exports = Gempa
+            var results = [];
+            search.each(function(i) {
+                if (i != 0) {
+                    var td = $(this).find('td');
+                    var result = {};
+                    td.each(function(i) {
+                        var value = $(this).find('a').html();
+                        var key = (i == 0) ? 'province' : (i == 1) ? 'city' : (i == 2) ? 'subdistrict' : (i == 3) ? 'urban' : 'postalcode';
+
+                        result[key] = value;
+                    })
+                    results.push(result);
+                }
+            });
+            return resolve(results);
+        });
+    });
+};
+
+module.exports = Kodepos

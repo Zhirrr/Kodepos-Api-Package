@@ -3,52 +3,42 @@
  * @license MIT
  */
 
-const scrapy = require('node-scrapy')
-const fetch = require("node-fetch");
-const url = 'https://kbbi.kemdikbud.go.id/entri/';
-const KBBI = (kata) => new Promise((resolve, reject) => {
-	try{
-		var  model = {
-			lema: 'h2',
-			arti: ['ol li', 'ul.adjusted-par']
-		}
-    var kata2 = kata;
-		fetch(url +kata)
-			.then((res) => res.text())
-			.then((body) => {
-				var log = scrapy.extract(body, model)
-				if(log.arti == null){
-					model = {
-            lema: 'h2',
-						arti: ['ul.adjusted-par']
-					}
-					fetch(url + kata2)
-						.then((res) => res.text())
-						.then((body) => {
-							log = scrapy.extract(body, model)
-							if(log.arti != null)
-								{
-                  var kata3 = log.arti.map(s => s.slice(1).split("  ").join(""));
-                  resolve({
-                    lema: log.lema,
-                    arti: kata3
-                  })
-                }
-							else{reject("Arti Tidak Ada Atau IP Terkena Limit");}
-						})
-				}
-				else
-        {
-          var kata =  log.arti.map(s => s.slice(1).split("  ").join(""));
-          resolve({
-            lema: log.lema,
-            arti: kata
-          })
-        }
-			})
-	} catch(err){
-		reject(err)
-	}
+
+const cheerio = require('cheerio')
+const axios = require('axios')
+
+const Gempa = () => new Promise((resolve, reject) => {
+  axios.get('https://www.bmkg.go.id/gempabumi/gempabumi-dirasakan.bmkg').then((response) => {
+  const $ = cheerio.load(response.data)
+
+  const urlElems = $('table.table-hover.table-striped')
+
+  for (let i = 0; i < urlElems.length; i++) {
+    const urlSpan = $(urlElems[i]).find('tbody')[0]
+
+    if (urlSpan) {
+      const urlData = $(urlSpan).find('tr')[0]
+      var Kapan = $(urlData).find('td')[1]
+      var Letak = $(urlData).find('td')[2]
+      var Magnitudo = $(urlData).find('td')[3]
+      var Kedalaman = $(urlData).find('td')[4]
+      var Wilayah = $(urlData).find('td')[5]
+      var lintang = $(Letak).text().split(' ')[0]
+      var bujur = $(Letak).text().split(' ')[2]
+      var hasil = {
+        Waktu: $(Kapan).text(),
+        Lintang: lintang,
+        Bujur: bujur,
+        Magnitudo: $(Magnitudo).text(),
+        Kedalaman: $(Kedalaman).text().replace(/\t/g, '').replace(/I/g, ''),
+        Wilayah: $(Wilayah).text().replace(/\t/g, '').replace(/I/g, '').replace('-','').replace(/\r/g, '').split('\n')[0],
+		Map: ''
+      }
+      // We then print the text on to the console
+      resolve(hasil);
+    }
+  }
+  }).catch(err => reject(err))
 })
 
-module.exports = KBBI;
+module.exports = Gempa

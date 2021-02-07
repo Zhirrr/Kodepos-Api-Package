@@ -1,17 +1,17 @@
-# Info Gempa Package
-Npm Package for Scrape Info Gempa
+# Kodepos API Package
+Npm Package for Scrape Kodepos
 
 ## How To Use
 
 ```
-const Gempa = require('gempa-api');
+const Kodepos = require('kodepos-api');
 
-Gempa().then(res => console.log(res))
+Kodepos('Jakarta Utara').then(data => console.log(data[0])).catch(err => console.log(err))
 
 ```
 
 # Link Package
-https://www.npmjs.com/package/gempa-api
+https://www.npmjs.com/package/kodepos-api
 
 # Note
 Made By 13 y.o Coder

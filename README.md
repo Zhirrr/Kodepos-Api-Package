@@ -1,4 +1,4 @@
-# KBBI Package
+# Info Gempa Package
 Npm Package for Scrape Info Gempa
 
 ## How To Use

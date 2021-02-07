@@ -34,7 +34,6 @@ const Gempa = () => new Promise((resolve, reject) => {
         Wilayah: $(Wilayah).text().replace(/\t/g, '').replace(/I/g, '').replace('-','').replace(/\r/g, '').split('\n')[0],
 		Map: ''
       }
-      // We then print the text on to the console
       resolve(hasil);
     }
   }

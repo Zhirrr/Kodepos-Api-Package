@@ -1,6 +1,6 @@
 {
-  "name": "kbbi-api-zhirrr",
-  "version": "2.0.0",
+  "name": "gempa-api",
+  "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "author": "Zahir Athallah <zhirrrgans@gmail.com>",
@@ -8,8 +8,8 @@
     "start": "index.js"
   },
   "dependencies": {
-    "node-fetch": "^2.6.1",
-    "node-scrapy": "^0.5.0"
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.3"

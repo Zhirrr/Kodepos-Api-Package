@@ -16,5 +16,5 @@ Kodepos('Jakarta Utara').then(data => console.log(data[0])).catch(err => console
 # Link Package
 https://www.npmjs.com/package/kodepos-api
 
-# Note
-Made By 13 y.o Coder
+# Credits
+ToastCodeDev
